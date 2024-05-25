@@ -1,0 +1,14 @@
+insert into activities (a_id, name, description, cost) values (389, 'pool', 'family', 0);
+insert into activities (a_id, name, description, cost) values (393, 'bar', 'adults', 50);
+insert into activities (a_id, name, description, cost) values (298, 'baooling', 'family', 30);
+insert into activities (a_id, name, description, cost) values (824, 'trip', 'family', 100);
+insert into activities (a_id, name, description, cost) values (552, 'cars', 'family', 150);
+insert into activities (a_id, name, description, cost) values (596, 'art', 'kids', 20);
+insert into activities (a_id, name, description, cost) values (759, 'spa', 'adults', 0);
+insert into activities (a_id, name, description, cost) values (78, 'ijump', 'kids', 40);
+insert into activities (a_id, name, description, cost) values (502, 'hair style', 'family', 70);
+insert into activities (a_id, name, description, cost) values (527, 'jip', 'adults', 80);
+insert into activities (a_id, name, description, cost) values (392, 'gymboree', 'kids', 10);
+insert into activities (a_id, name, description, cost) values (45, 'rooftop party', 'adults', 50);
+insert into activities (a_id, name, description, cost) values (794, 'omega', 'family', 60);
+commit;
