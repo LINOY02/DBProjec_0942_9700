@@ -1,0 +1,75 @@
+CREATE TABLE VirtualRooms
+(
+  r_id INT NOT NULL,
+  room_type INT NOT NULL,
+  floor INT,
+  PRIMARY KEY (r_id)
+);
+
+INSERT INTO VirtualRooms (r_id, room_type)
+SELECT r_id, room_type
+FROM Rooms;
+
+ALTER TABLE Rooms
+ADD floor INT;
+
+BEGIN
+    FOR i IN 2..20 LOOP
+        UPDATE Rooms
+        SET floor = i
+        WHERE r_id IN (
+            SELECT r_id
+            FROM (
+                SELECT r_id
+                FROM Rooms
+                WHERE floor IS NULL
+                ORDER BY DBMS_RANDOM.VALUE
+            )
+            WHERE ROWNUM <= 40
+        );
+    END LOOP;
+END;
+
+SELECT * FROM Rooms ;
+
+
+
+
+-----------------------------------
+
+SELECT *
+FROM bookingactivities WHERE b_id=699;
+
+SELECT * FROM payment WHERE p_id = 213 OR  p_id = 110 OR  p_id = 310;
+
+UPDATE PAYMENT P
+SET p.cost = p.cost-100
+WHERE p.p_id IN (SELECT p2.p_id FROM payment p2 JOIN booking b1 ON p2.p_id = b1.p_id WHERE p2.p_id IN
+       (SELECT p1.p_id
+       FROM payment p1 
+       WHERE p1.cost > (SELECT AVG(p2.cost)
+                  FROM payment p2
+                  WHERE p2.Payment_Date LIKE '%_2') AND b1.c_id IN (SELECT b.c_id
+                                                                          FROM Booking b JOIN BookingActivities ba ON b.b_id = ba.b_id
+                                                                          GROUP BY b.c_id
+                                                                          HAVING COUNT(ba.a_id) >(SELECT AVG(activity_count) AS activity_avg
+                                                                          FROM (SELECT COUNT(ba.a_id) AS activity_count
+                                                                          FROM Booking b JOIN BookingActivities ba ON b.b_id = ba.b_id
+                                                                          WHERE b.check_in LIKE '%_2'
+GROUP BY b.c_id)))));        
+
+-----------------------------------------
+
+SELECT * FROM activities;
+insert into HOTEL.PAYMENT (P_ID, COST, PAYMENT_DATE)
+values (310, 95123, to_date('14-03-2022', 'dd-mm-yyyy'));
+insert into HOTEL.BOOKING (B_ID, CHECK_IN, CHECK_OUT, C_ID, P_ID)
+values (909, to_date('15-01-2022', 'dd-mm-yyyy'), to_date('19-01-2022', 'dd-mm-yyyy'), 215, 310);
+insert into HOTEL.BOOKINGACTIVITIES (B_ID, A_ID)
+values (909, 527);
+insert into HOTEL.BOOKINGACTIVITIES (B_ID, A_ID)
+values (909, 794);
+insert into HOTEL.BOOKINGACTIVITIES (B_ID, A_ID)
+values (909, 502);
+insert into HOTEL.CUSTOMER (C_ID, NAME, EMAIL, PHONE)
+values (215, 'Alon-Hyde', 'Al@providen', 592364238);
