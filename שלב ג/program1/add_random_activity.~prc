@@ -1,0 +1,29 @@
+CREATE OR REPLACE PROCEDURE add_random_activity(cust_id IN NUMBER) 
+IS
+    activity_id activities.a_id%TYPE;
+    booking_id booking.b_id%TYPE;
+BEGIN
+    SELECT b_id INTO booking_id
+    FROM booking
+    WHERE c_id = cust_id AND ROWNUM = 1
+    ORDER BY DBMS_RANDOM.VALUE;
+    -- Select a random activity_id from activities table
+    SELECT a_id INTO activity_id
+    FROM activities
+    WHERE ROWNUM = 1
+    ORDER BY DBMS_RANDOM.VALUE;
+
+    -- Insert into BookingActivities
+    INSERT INTO BookingActivities (b_id, a_id)
+    VALUES (booking_id, activity_id);
+
+     -- Commit after each insert
+
+    -- Print the added activity for customer
+    DBMS_OUTPUT.PUT_LINE('Added activity ' || activity_id || ' for customer ' || cust_id);
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END add_random_activity;
+/

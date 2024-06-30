@@ -1,0 +1,54 @@
+CREATE OR REPLACE PROCEDURE update_salary(p_a_id IN NUMBER, p_b_id IN NUMBER) 
+IS
+    CURSOR employeeCursor IS
+        SELECT e.e_id, e.salary
+        FROM Employes e
+        JOIN work w ON e.e_id = w.e_id
+        JOIN Activities a ON w.a_id = a.a_id
+        WHERE a.a_id = p_a_id;
+        
+    payment_update payment.cost%TYPE;
+    employee_id Employes.e_id%TYPE;
+    current_salary Employes.salary%TYPE;
+    temp NUMBER;
+BEGIN
+    SELECT p.cost INTO payment_update
+    FROM booking b JOIN payment p ON b.p_id=p.p_id
+    WHERE b.b_id=p_b_id;
+    
+    IF payment_update IS NOT NULL THEN
+    -- Loop through each employee associated with the activity
+      FOR employee_rec IN employeeCursor LOOP
+        employee_id := employee_rec.e_id;
+        current_salary := employee_rec.salary;
+
+        -- Update the employee's salary
+        UPDATE Employes
+        SET salary = current_salary * 1.10
+        WHERE e_id = employee_id;
+        
+        DBMS_OUTPUT.PUT_LINE('Updated salary for employee ' || employee_id || ' for ' || current_salary * 1.10);
+        
+        -- Update the customer's payment
+        UPDATE payment
+        SET cost = cost + current_salary * 0.10
+        WHERE p_id in (SELECT p.p_id
+                       FROM booking b JOIN payment p ON b.p_id=p.p_id
+                       WHERE b.b_id=p_b_id);
+        
+        temp := payment_update + current_salary * 0.10; 
+             
+        DBMS_OUTPUT.PUT_LINE('Updated payment' || p_b_id || ' for ' || temp);
+    END LOOP;
+    
+    COMMIT; -- Commit the transaction
+    END IF;
+    
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('No employee found for activity ' || p_a_id);
+    WHEN OTHERS THEN
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END update_salary;
+/
