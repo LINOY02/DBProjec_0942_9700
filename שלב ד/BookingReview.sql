@@ -1,0 +1,29 @@
+--המידע המוצג כאן ייתן סקירה של ההזמנות, הלקוחות, התשלומים והחדרים.
+CREATE VIEW BookingReview AS
+SELECT
+    b.b_id AS Booking_ID,
+    c.name AS Customer_Name,
+    c.email AS Customer_Email,
+    c.phone AS Customer_Phone,
+    p.cost AS Payment_Cost,
+    p.payment_date AS Payment_Date,
+    COUNT(b.b_id) AS Number_of_Rooms
+FROM Booking b
+JOIN Customer c ON b.c_id = c.c_id
+JOIN Payment p ON b.p_id = p.p_id
+JOIN BookingRooms br ON b.b_id = br.b_id
+JOIN Rooms r ON br.r_id = r.r_id
+GROUP BY b.b_id, c.name, c.email, c.phone, p.cost, p.payment_date;
+
+select * from BookingReview;
+
+--שאילתה שמחזירה את שמות הלקוחות והאטרקציות שלהם אלו שהזמינו 4 או יותר חדרים בהזמנה אחת
+select br.Customer_Name, a.attraction_name
+from BookingReview br JOIN booking b ON br.Booking_ID=b.b_id JOIN bookingactivities ba 
+ON b.b_id=ba.b_id JOIN attractions a ON ba.a_id=a.a_id
+where br.Number_of_Rooms >=4
+
+--שאילתה שמחזירה פרטי לקוח שסכום ההזמנה שלו עולה על 5000 ומשלם לפני תאריך יציאה מהמלון
+select br.Customer_Name, br.Customer_Email, br.Customer_Phone
+from BookingReview br JOIN booking b ON br.Booking_ID=b.b_id 
+where br.Payment_Cost > 5000 and br.payment_date < b.check_out;
